@@ -1,1 +1,2 @@
 # something
+print "hi"
