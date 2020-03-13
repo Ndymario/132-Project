@@ -13,6 +13,6 @@ def codingTime():
     pass
 
 ########################### MAIN ##############################
-somthingElse()
+somethingElse()
 # nothing important here
 
