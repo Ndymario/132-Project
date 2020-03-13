@@ -12,4 +12,8 @@ def ohYeah():
 def codingTime():
     pass
 
+<<<<<<< HEAD
 somthingElse()
+=======
+# nothing important here
+>>>>>>> 86c02a1c70e15b524653b27c21f9db9103844f05
