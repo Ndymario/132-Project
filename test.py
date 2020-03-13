@@ -7,7 +7,7 @@ def somethingElse():
     print " Josh got it to work"
 
 def ohYeah():
-    # this will never work
+    # this will might work
     pass
 
 def codingTime():
