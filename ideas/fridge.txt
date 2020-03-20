@@ -1,0 +1,13 @@
+Fridge Addon
+
+Purpose:
+	To register perisable food on rasberry pi and be notified when food will expire. 
+
+What it does:
+	Uses barcode scanner or camera to figure out what food you store in your fridge. 
+	Notifies user when food is about to expire
+	
+Parts:
+	rasberry pi camera ($10)
+	rasberry pi 
+	

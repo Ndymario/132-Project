@@ -1,0 +1,10 @@
+Run Away Alarm Clock
+
+Purpose:
+	when the snooze button is hit it will hide somewhere in your room 
+
+Parts:
+	wheels
+	possible a photosensor
+	pie zero
+	sonar

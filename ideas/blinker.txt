@@ -1,0 +1,7 @@
+Automatic blinker
+
+Purpose:
+	pulls data from gps to activate car blinkers
+
+Parts: 
+something
