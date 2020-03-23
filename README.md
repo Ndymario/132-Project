@@ -1,5 +1,3 @@
 # 132-Project
 
-Just messing around with git stuff for now.
-
-This will become something cool...eventually
+Here's where we're going to be sharing our code for our 132-project!
