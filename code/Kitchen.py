@@ -1,6 +1,9 @@
 class Item(object):
     def __init__(self, name):
         self.name = name
+        
+    sef __str__(self):
+        return "{}".format(self.name)
 
 class Perishable(Item):
     def __init__(self, name, experationDate):
