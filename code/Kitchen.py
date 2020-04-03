@@ -2,7 +2,7 @@ class Item(object):
     def __init__(self, name):
         self.name = name
         
-    sef __str__(self):
+    def __str__(self):
         return "{}".format(self.name)
 
 class Perishable(Item):
