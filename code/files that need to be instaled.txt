@@ -1,0 +1,4 @@
+# python -m " all the files below"
+# install beautifulsoup4, lxml , and requests
+
+ex. ( python -m pip install beautifulsoup4 )
