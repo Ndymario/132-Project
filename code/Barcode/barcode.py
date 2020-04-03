@@ -1,18 +1,47 @@
-import urllib2
+## important ####
+# python -m " all the files below"
+# install beautifulsoup, lxml , and requests
+
+
 import requests
 from bs4 import BeautifulSoup
 import pprint
 
-url = 'https://www.barcodelookup.com/'
+
+
+
+
+def lookupname(barcode):
+    url = 'https://www.barcodelookup.com/'
+    barcode = barcode
+    page = requests.get(url + barcode)
+    soup = BeautifulSoup(page.content, 'lxml')
+    item_name = soup.find('h4')
+    bcheck = item_name.text.strip()
+    
+    if ("API" in bcheck):
+        name = "Item not in DataBase!"
+        
+
+    else:
+        name = bcheck
+    return name
+    
+    
 barcode = raw_input(" enter a barcode ")
-page = requests.get(url + barcode
-                    )
-soup = BeautifulSoup(page.content, 'lxml')
-
-item_name = soup.find('h4')
-
-name = item_name.text.strip()
+name = lookupname(barcode)
 print name
+
+
+##url = 'https://www.barcodelookup.com/'
+##barcode = raw_input(" enter a barcode ")
+##page = requests.get(url + barcode)
+##soup = BeautifulSoup(page.content, 'lxml')
+##
+##item_name = soup.find('h4')
+##
+##name = item_name.text.strip()
+##print name
 
 
 ##url = 'https://www.barcodelookup.com/028400070560'
@@ -44,6 +73,4 @@ print name
 ####    print(link.get('href'))
 
 
-## important ####
-# python -m " all the files below"
-# install beautifulsoup, lxml , and requests
+
