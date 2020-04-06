@@ -24,8 +24,18 @@ def lookupname(barcode):
         
 
     else:
-        name = bcheck
+        name = namecheck(bcheck)
     return name
+
+def namecheck(name):
+    name = name
+    check =raw_input( "Is this corect: {}? \nY/N  ".format(name))
+    check = check.lower()
+    if (check == "y" or check == "yes"):
+        return name
+    else:
+        name = raw_input("Type corect name")
+        return name
     
     
 barcode = raw_input(" enter a barcode ")
