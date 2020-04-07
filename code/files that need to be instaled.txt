@@ -2,3 +2,9 @@
 # install beautifulsoup4, lxml , and requests
 
 ex. ( python -m pip install beautifulsoup4 )
+
+For Jacob's part:
+type into command promt:
+	python -m pip install numpy
+	python -m pip install imutils
+	python -m pip install opencv-python
