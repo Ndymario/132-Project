@@ -1,0 +1,7 @@
+for detectBarcode
+go to cmd and go to the location where detectBarcode is
+type: python detectBarcode.py --image barcode_01.jpg
+
+ for barcodeScanner make sure to install pyzbar
+go to cmd and go to file location where barcodeScanner is
+type: python barcodeScanner.py --image barcode_01.jpg
