@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import *
+import pickle
 
 
 
@@ -54,17 +55,11 @@ def lookupname(barcode):
         soup = BeautifulSoup(page.content, 'lxml')
         item_name = soup.find('h4')
         bcheck = item_name.text.strip()
-        
-        if ("API" in bcheck):
-            name = "Item not in DataBase!"
-            
-
-        else:
-            name = namecheck(bcheck)
+        name = namecheck(bcheck)
         return name
 # a function to check to see if the barcode was corect
-def namecheck(name):
-    name = name
+def namecheck(tempname):
+    name = tempname
     check =raw_input( "Is this corect: {}? \nY/N  ".format(name))
     check = check.lower()
     if (check == "y" or check == "yes"):
@@ -91,14 +86,27 @@ def getEXP():
     exp = date(year, month, day)
    
     return exp
-
-
+# a function to save data when python is off use name "mydata" for now
+def savedata(val, name):
+    with open('{}.pickle'.format(name), 'wb') as mysavedata:
+        pickle.dump(val, mysavedata)
+# a function to load data after python is off use name "mydata" for now can change it if there are more things to save
+def loaddata(name):
+    with open('{}.pickle'.format(name), 'rb') as myrestoredata:
+        alist = pickle.load(myrestoredata)
+        return alist
 ######## some test code ########
-# sample barcodes 054500193243 , 
+# sample barcodes 054500193243 ,
+alist = []
+print alist
+##alist = loaddata("mydata")
+print alist
+##print alist[0]
 barcode = raw_input(" enter a barcode ")
 p1 = Perishable(lookupname(barcode),getEXP())
+alist.append(p1)
 
-
+savedata(alist, "mydata")
 print p1 #sample to print out a parishable item
 print "today is {}".format(p1.today) # was a sample to print todays date
 remain = (p1.experationDate - p1.today) # sample to get how much longer till experation
