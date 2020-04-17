@@ -19,7 +19,21 @@ class Perishable(Item):
     def __init__(self, name, experationDate):
         Item.__init__(self, name)
         self.experationDate = experationDate
+        self.time_left = 100
 
+    @property
+    def time_left(self):
+        return self._time_left
+
+    @time_left.setter
+    def time_left(self,val):
+        remain = (self.experationDate - self.today)
+        self._time_left = remain.days
+
+    def updateEXP(self):
+        remain = (self.experationDate - self.today)
+        self.time_left = remain.days
+    
     def __str__(self):
         return "Name: {} \nExperation: {}".format(self.name, self.experationDate)
         
@@ -89,3 +103,6 @@ print p1 #sample to print out a parishable item
 print "today is {}".format(p1.today) # was a sample to print todays date
 remain = (p1.experationDate - p1.today) # sample to get how much longer till experation
 print "{} has {} days left".format(p1.name, remain.days) # sample to get the remanig days
+print p1.time_left
+p1.updateEXP()
+print p1.time_left
