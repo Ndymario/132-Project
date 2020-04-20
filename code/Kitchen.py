@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import *
 import pickle
-from barcodeScanner3function.py import *
+from barcodeScanner3function import *
 
 
 
