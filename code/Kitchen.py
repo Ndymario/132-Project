@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import *
 import pickle
+from barcodeScanner3function.py import *
 
 
 
@@ -102,7 +103,7 @@ print alist
 ##alist = loaddata("mydata")
 print alist
 ##print alist[0]
-barcode = raw_input(" enter a barcode ")
+barcode = encodeBarcode()
 p1 = Perishable(lookupname(barcode),getEXP())
 alist.append(p1)
 
