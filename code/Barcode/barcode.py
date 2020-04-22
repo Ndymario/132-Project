@@ -12,9 +12,10 @@ from bs4 import BeautifulSoup
 
 
 def lookupname(barcode):
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
     url = 'https://www.barcodelookup.com/'
     barcode = barcode
-    page = requests.get(url + barcode)
+    page = requests.get(url + barcode, headers=headers)
     soup = BeautifulSoup(page.content, 'lxml')
     item_name = soup.find('h4')
     bcheck = item_name.text.strip()
