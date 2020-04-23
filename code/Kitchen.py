@@ -1,18 +1,29 @@
+#######################################
+# Contributors (to this file):
+# Date: 04/20/20
+# Description: The main program.
+#######################################
+
+# Import libraries we want to use
+import sys
 import requests
 from bs4 import BeautifulSoup
 from datetime import *
 import pickle
-from barcodeScanner3function import *
 
+# Allow us to import a .py from another folder; makes the backend cleaner
+sys.path.insert(1, "./Camera")
+sys.path.insert(1, "./Experation_Date_Tracker")
+
+# Import helper python files
+from barcodeScanner3function import *
+from experation_date_tracker import *
 
 
 class Item(object):
     def __init__(self, name):
         self.name = name        
         self.today = date.today()
-
-    
-
         
     def __str__(self):
         return "Name: {}".format(self.name)
@@ -38,8 +49,6 @@ class Perishable(Item):
     
     def __str__(self):
         return "Name: {} \nExperation: {}".format(self.name, self.experationDate)
-        
-
         
 class NonPerishable(Item):
     def __init__(self, name):
@@ -100,14 +109,14 @@ def loaddata(name):
 # sample barcodes 054500193243 ,
 alist = []
 print alist
-##alist = loaddata("mydata")
+##alist = loaddata("rick")
 print alist
 ##print alist[0]
 barcode = encodeBarcode()
 p1 = Perishable(lookupname(barcode),getEXP())
 alist.append(p1)
 
-savedata(alist, "mydata")
+savedata(alist, "rick")
 print p1 #sample to print out a parishable item
 print "today is {}".format(p1.today) # was a sample to print todays date
 remain = (p1.experationDate - p1.today) # sample to get how much longer till experation
