@@ -22,7 +22,7 @@ tp10
 Rp11
 sS'_time_left'
 p12
-I-2
+I-3
 sS'name'
 p13
 VJif Extra Crunchy Peanut Butter, 28-Ounce
@@ -30,7 +30,7 @@ p14
 sS'today'
 p15
 g8
-(S'\x07\xe4\x04\x17'
+(S'\x07\xe4\x04\x18'
 p16
 tp17
 Rp18
@@ -47,13 +47,13 @@ p22
 tp23
 Rp24
 sg12
-I0
+I-1
 sg13
 S'Coke'
 p25
 sg15
 g8
-(S'\x07\xe4\x04\x17'
+(S'\x07\xe4\x04\x18'
 p26
 tp27
 Rp28
@@ -70,13 +70,13 @@ p32
 tp33
 Rp34
 sg12
-I226
+I225
 sg13
 S'soup2'
 p35
 sg15
 g8
-(S'\x07\xe4\x04\x17'
+(S'\x07\xe4\x04\x18'
 p36
 tp37
 Rp38
@@ -93,13 +93,13 @@ p42
 tp43
 Rp44
 sg12
-I650
+I649
 sg13
 S'MILK'
 p45
 sg15
 g8
-(S'\x07\xe4\x04\x17'
+(S'\x07\xe4\x04\x18'
 p46
 tp47
 Rp48
