@@ -13,14 +13,12 @@ import pickle
 
 # Allow us to import a .py from another folder; makes the backend cleaner
 sys.path.insert(1, "./Camera")
-sys.path.insert(1, "./Experation_Date_Tracker")
+sys.path.insert(1, "./Experation_Tracker")
 
 # Import helper python files
 from barcodeScanner3function import *
 from experation_date_tracker import *
 
-DEBUG = True
-SAVEFILE = "Rick"
 
 class Item(object):
     def __init__(self, name):
@@ -46,12 +44,11 @@ class Perishable(Item):
         self._time_left = remain.days
 
     def updateEXP(self):
-        self.today = date.today()
         remain = (self.experationDate - self.today)
         self.time_left = remain.days
     
     def __str__(self):
-        return "Name: {} \nExperation: {} \nDaysleft: {}".format(self.name, self.experationDate, self.time_left)
+        return "Name: {} \nExperation: {}".format(self.name, self.experationDate)
         
 class NonPerishable(Item):
     def __init__(self, name):
@@ -62,22 +59,14 @@ class NonPerishable(Item):
 #   **** i dont know if this should be in a class because
 #   **** all classes need a name before beang created       
 def lookupname(barcode):
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac'\
-               'OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
-    url = 'https://www.barcodelookup.com/'
-    barcode = barcode
-    if (DEBUG):
-        print "(lookupname) barcode = {}".format(barcode)
-    page = requests.get(url + barcode, headers = headers)
-    if (DEBUG):
-        print "(lookupname) page = {}".format(page)
-    soup = BeautifulSoup(page.content, 'lxml')
-    item_name = soup.find('h4')
-    if (DEBUG):
-        print "(lookupname) item_name = {}".format(item_name)
-    bcheck = item_name.text.strip()
-    name = namecheck(bcheck)
-    return name
+        url = 'https://www.barcodelookup.com/'
+        barcode = barcode
+        page = requests.get(url + barcode)
+        soup = BeautifulSoup(page.content, 'lxml')
+        item_name = soup.find('h4')
+        bcheck = item_name.text.strip()
+        name = namecheck(bcheck)
+        return name
 # a function to check to see if the barcode was corect
 def namecheck(tempname):
     name = tempname
@@ -116,36 +105,6 @@ def loaddata(name):
     with open('{}.pickle'.format(name), 'rb') as myrestoredata:
         alist = pickle.load(myrestoredata)
         return alist
-
-# adds an item to the list
-def additem(alist):
-    barcode = encodeBarcode()
-    if (DEBUG):
-        print "(additem)barcode = {}".format(barcode)
-    name = lookupname(barcode)
-    experation = getEXP()
-    item = Perishable(name, experation)
-    alist.append(item)
-    return alist
-
-def sortitems(alist):
-    n = len(alist)
-    for i in range(0, n-1):
-        minpos = i
-        for j in range(i + 1, n):
-            if(alist[j].time_left < alist[minpos].time_left):
-                minpos = j
-        temp = alist[i]
-        alist[i] = alist[minpos]
-        alist[minpos] = temp
-        
-    return alist
-def update():
-    alist = loaddata(SAVEFILE)
-    for i in range(len(alist)):
-        alist[i].updateEXP()
-    return alist
-    
 ######## some test code ########
 # sample barcodes 054500193243 ,
 alist = []
