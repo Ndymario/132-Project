@@ -10,7 +10,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import *
 import pickle
-from Tkinter import *
+import Tkinter as tk
 # Allow us to import a .py from another folder; makes the backend cleaner
 sys.path.insert(1, "./Camera")
 sys.path.insert(1, "./Experation_Tracker")
@@ -21,9 +21,11 @@ from barcodeScanner3function import *
 
 DEBUG = True
 SAVEFILE = "Rick"
-
+alist = []
 WIDTH = 30
 HEIGHT = 10
+LARGE_FONT= ("Verdana", 12)
+
 
 class Item(object):
     def __init__(self, name):
@@ -65,23 +67,55 @@ class NonPerishable(Item):
     def __init__(self, name):
         Item.__init__(self, name)
 
-class MainGui(Frame):
-    def __init__(self, master):
-        Frame.__init__(self, master)
-        self.master = master
+class GUI(tk.Tk):
+    
+    def __init__(self, *args, **kwargs):
+        
+        tk.Tk.__init__(self, *args, **kwargs)
+        container = tk.Frame(self)
 
-    def setupGUI(self):
+        container.pack(side="top", fill="both", expand = True)
+
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
+
+        self.frames = {}
+
+        for F in [MainGui, ADD, Manual, Manual1]:
+
+            frame = F(container,self)
+
+            self.frames[F] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+
+        self.show_frame(MainGui)
+        
+    def show_frame(self, cont):
+        #frame = cont(container,self)
+        frame = self.frames[cont]        
+        frame.tkraise()
+        
+                
+class MainGui(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self,parent)
+        label = tk.Label(self, text="Kitchen Gadget", font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+        alist = updateList()
         if (len(alist) <= 10):
             for i in range(len(alist)):
                 if (alist[i].time_left <= 5):
                     BG = "red"
+                elif (alist[i].time_left <= 10):
+                    BG = "yellow"
                 else:
                     BG = "green"
                 TX = "{}  EXPERATION: {}".format(alist[i].name,alist[i].experationDate)
-                text_frame = Label(self.master,text = "{}".format(TX), bg = "{}".format(BG),\
+                text_frame = tk.Label(self,text = "{}".format(TX), bg = "{}".format(BG),\
                                    width = WIDTH, height = HEIGHT/8)
 
-                text_frame.pack(side = TOP, fill = X)
+                text_frame.pack(side = "top", fill = "x")
                 text_frame.pack_propagate(False)
         else:
             for i in range(10):
@@ -90,23 +124,134 @@ class MainGui(Frame):
                 else:
                     BG = "green"
                 TX = "{}  EXPERATION: {}".format(alist[i].name,alist[i].experationDate)
-                text_frame = Label(self.master,text = "{}".format(TX), bg = "{}".format(BG),\
+                text_frame = tk.Label(self.master,text = "{}".format(TX), bg = "{}".format(BG),\
                                    width = WIDTH, height = HEIGHT/8)
 
-                text_frame.pack(side = TOP, fill = X)
+                text_frame.pack(side = "top", fill = "x")
                 text_frame.pack_propagate(False)
         
-        addbutton = Button(self.master, text =  "Add Item", fg = "black", width = (WIDTH)\
-                           , height = (HEIGHT))
-        addbutton.pack(side = LEFT)
+        addbutton = tk.Button(self, text =  "Add Item", fg = "black", width = (WIDTH)\
+                           , height = (HEIGHT), command=lambda: controller.show_frame(ADD))
+        addbutton.pack(side = "left")
 
-        listbutton = Button(self.master, text =  "list", fg = "black", width = WIDTH\
+        listbutton = tk.Button(self, text =  "list", fg = "black", width = WIDTH\
                             ,height = (HEIGHT))
-        listbutton.pack(side = LEFT)
+        listbutton.pack(side = "left")
 
-        removebutton = Button(self.master, text =  "Remove Item", fg = "black",\
+        removebutton = tk.Button(self, text =  "Remove Item", fg = "black",\
                               width = WIDTH,height = (HEIGHT))
-        removebutton.pack(side = LEFT)
+        removebutton.pack(side = "left")
+
+class ADD(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="How to enter item", font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+
+        button1 = tk.Button(self, text="Scan",
+                            command=lambda: controller.show_frame(MainGui))
+        button1.pack()
+
+        button2 = tk.Button(self, text="Manual",
+                            command=lambda: controller.show_frame(Manual))
+        button2.pack()
+
+class Manual(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="Manualy enter item", font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+        name = 1
+        month =1
+        day = 1
+        year =1
+        
+        def callback():
+            global alist
+            name = e1.get()
+            month = int(e2.get())
+            day = int(e3.get())
+            year = int(e4.get())
+            exp = date(year, month, day)
+            alist = additemManual(alist, name, exp)
+            for i in range(len(alist)):
+                print alist[i]
+            
+            controller.show_frame(Manual1)
+        l1 = tk.Label(self, text= "Name: ")
+        l1.pack()
+        e1 = tk.Entry(self, bg ="white")
+        e1.pack()
+        
+        l2 = tk.Label(self, text= "Month: ")
+        l2.pack()
+        e2 = tk.Entry(self, bg ="white")
+        e2.pack()
+
+        l3 = tk.Label(self, text= "Day: ")
+        l3.pack()
+        e3 = tk.Entry(self, bg ="white")
+        e3.pack()
+
+        l4 = tk.Label(self, text= "Year: ")
+        l4.pack()
+        e4 = tk.Entry(self, bg ="white")
+        e4.pack()
+
+        button1 = tk.Button(self, text="ENTER",
+                            command = callback)
+        button1.pack()
+        
+        
+            
+class Manual1(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="Manualy enter item", font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+        
+        
+        def callback():
+            print Manual.e1.get()
+            pass
+            name = e1.get()
+            month = e2.get()
+            day = e3.get()
+            year = e4.get()
+            controller.show_frame(Manual1)
+        l1 = tk.Label(self, text= "Name: ")
+        l1.pack()
+        e1 = tk.Entry(self, bg ="white")
+        e1.pack()
+        
+        l2 = tk.Label(self, text= "Month: ")
+        l2.pack()
+        e2 = tk.Entry(self, bg ="white")
+        e2.pack()
+
+        l3 = tk.Label(self, text= "Day: ")
+        l3.pack()
+        e3 = tk.Entry(self, bg ="white")
+        e3.pack()
+
+        l4 = tk.Label(self, text= "Year: ")
+        l4.pack()
+        e4 = tk.Entry(self, bg ="white")
+        e4.pack()
+
+        button1 = tk.Button(self, text="ENTER",
+                            command = callback)
+        button1.pack()
+                
+        button2 = tk.Button(self, text="NEXT",
+                            command = lambda: controller.show_frame(MainGui))
+        button2.pack()
+        name = e1.get()
+        month = e2.get()
+        day = e3.get()
+        year = e4.get()
+        print name
+        
 ###################### other def #########################
 
 #   a function to look up a name
@@ -178,7 +323,11 @@ def additem(alist):
     item = Perishable(name, experation)
     alist.append(item)
     return alist
-
+def additemManual(alist, name, experation):
+    item = Perishable(name, experation)
+    alist.append(item)
+    return alist
+    
 def sortitems(alist):
     n = len(alist)
     for i in range(0, n-1):
@@ -191,7 +340,7 @@ def sortitems(alist):
         alist[minpos] = temp
         
     return alist
-def update():
+def updateList():
     alist = loaddata(SAVEFILE)
     for i in range(len(alist)):
         alist[i].updateEXP()
@@ -199,10 +348,10 @@ def update():
     
 ######## some test code ########
 # sample barcodes 054500193243 ,
-alist = []
+
 print "The curent list is as follows"
 
-alist = update()
+alist = updateList()
 for i in range(len(alist)):
     print alist[i]
 
@@ -218,14 +367,16 @@ for i in range(len(alist)):
 
 savedata(alist, SAVEFILE)
 
-window = Tk()
+window = GUI()
 
-window.title("Kitchen")
+##window.title("Kitchen")
 
-p = MainGui(window)
-p.setupGUI()
+##p = MainGui(window)
+##p.setupGUI()
 
 window.mainloop()
+for i in range(len(alist)):
+    print alist[i]
 
 ### old code used to run test
 ##print "#"*30
