@@ -9,6 +9,4 @@ Wehave decided to go with the "Fridge Companion", the other ideas remain for the
 
 code/ is where all of our program files are; the heart of the project
 
-Misc/ is where any write-up things are; required for our grade
-
 ideas/ is where our ideas for the project are; keptfor historical purposes
