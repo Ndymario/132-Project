@@ -17,9 +17,9 @@ sys.path.insert(1, "./Experation_Tracker")
 
 # Import helper python files
 from barcodeScanner3function import *
-from experation_date_tracker import *
+#from experation_date_tracker import *
 
-DEBUG = True
+DEBUG = False
 SAVEFILE = "Rick"
 
 class Item(object):
@@ -155,13 +155,13 @@ def update():
 # sample barcodes 054500193243 ,
 alist = []
 print "The curent list is as follows"
-
-alist = update()
+########################################Uncomint after the fist run so the Pickle file is empty.############################
+#alist = update()
 for i in range(len(alist)):
     print alist[i]
 
 
-##alist = additem(alist)
+alist = additem(alist)
 alist = sortitems(alist)
 
 
@@ -171,6 +171,13 @@ for i in range(len(alist)):
 
 
 savedata(alist, SAVEFILE)
+
+
+
+
+
+
+
 
 
 ### old code used to run test
