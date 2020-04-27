@@ -125,9 +125,19 @@ def loaddata(name):
 # adds an item to the list
 def additem(alist):
     barcode = encodeBarcode()
+
+    count = 0
     if (DEBUG):
         print "(additem)barcode = {}".format(barcode)
-    name = lookupname(barcode)
+    if (barcode == None):
+        count = 1
+        barcode = encodeBarcode()
+            
+    if (count == 1 and barcode == None):
+        name = raw_input("Enter name: ")
+    else:
+        name = lookupname(barcode)
+    
     experation = getEXP()
     item = Perishable(name, experation)
     alist.append(item)
@@ -156,7 +166,7 @@ def update():
 alist = []
 print "The curent list is as follows"
 ########################################Uncomint after the fist run so the Pickle file is empty.############################
-#alist = update()
+alist = update()
 for i in range(len(alist)):
     print alist[i]
 

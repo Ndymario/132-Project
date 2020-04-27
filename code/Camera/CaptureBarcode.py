@@ -21,5 +21,6 @@ def takePicture():
     elif (button == "b"):
         # turn off camera
         camera.stop_preview()
+    camera.close()
 
-# takePicture()
+#takePicture()
