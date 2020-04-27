@@ -1,7 +1,10 @@
 from pyzbar import pyzbar
 import cv2
+from CaptureBarcode import *
 
 def encodeBarcode():
+    # runs function take picture in CaptureBarcode
+    takePicture()
     # load image
     image = cv2.imread("barcode_01.jpg")
 
