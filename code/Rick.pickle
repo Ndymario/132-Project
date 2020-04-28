@@ -22,7 +22,7 @@ tp10
 Rp11
 sS'_time_left'
 p12
-I8
+I7
 sS'name'
 p13
 S'Leftovers'
@@ -30,7 +30,7 @@ p14
 sS'today'
 p15
 g8
-(S'\x07\xe4\x04\x1b'
+(S'\x07\xe4\x04\x1c'
 p16
 tp17
 Rp18
