@@ -1,9 +1,13 @@
 from picamera import PiCamera
 from time import sleep
+from setFocus import *
 
 def takePicture():
     # make camera = PiCamera() to make it easier to code
     camera = PiCamera()
+
+    # set camera focus
+    setFocus()
 
     # set camera resolution and framerate
     camera.resolution = (2592, 1944)

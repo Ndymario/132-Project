@@ -19,7 +19,7 @@ sys.path.insert(1, "./Experation_Tracker")
 from barcodeScanner3function import *
 #from experation_date_tracker import *
 
-DEBUG = True
+DEBUG = False
 SAVEFILE = "Rick"
 
 class Item(object):
