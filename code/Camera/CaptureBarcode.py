@@ -1,6 +1,13 @@
 from picamera import PiCamera
-from time import sleep
 from setFocus import *
+import RPi.GPIO as GPIO
+
+# set up button
+button = 18
+
+# set up GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(button, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
 def takePicture():
     # make camera = PiCamera() to make it easier to code
@@ -15,16 +22,15 @@ def takePicture():
     # show preview of camera
     camera.start_preview()
 
-    # camera takes a picture if you hit ENTER
-    button = raw_input("Press ENTER to take picture, b and ENTER to cancel. ")
-    if (button == ""):
-        # take a picture and save it to 132-project as barcode_01
-        camera.capture("/home/pi/Documents/Python programs/132-project/132-Project/code/barcode_01.jpg")
-        # turn on preview
-        camera.stop_preview()
-    elif (button == "b"):
-        # turn off camera
-        camera.stop_preview()
+    # camera takes a picture if you hit button on breadboard
+    while (True):
+        if (GPIO.input(button) == GPIO.HIGH):
+            # take a picture and save it to 132-project as barcode_01
+            camera.capture("/home/pi/Documents/Python programs/132-project/132-Project/code/barcode_01.jpg")
+            # turn on preview
+            camera.stop_preview()
+            break
+            
     camera.close()
 
 #takePicture()
