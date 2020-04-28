@@ -18,8 +18,10 @@ sys.path.insert(1, "./Experation_Tracker")
 # Import helper python files
 from barcodeScanner3function import *
 #from experation_date_tracker import *
-
+# global variables
 DEBUG = False
+CLEAR_LIST = True # Make true if you want the list clear each time the program is run
+                  # make False if you want to bring back the last items enterd
 SAVEFILE = "Rick"
 alist = []
 WIDTH = 30
@@ -29,7 +31,7 @@ NAME_CHECK = "name"
 MOUNTH_CHECK = "between 1 and 12"
 DAY_CHECK = "pick an apropriat day"
 YEAR_CHECK = "greater thatn this year"
-MANUAL_CHECK = 0
+MANUAL_CHECK = 0 # a variable that lets certan buttons show up under right conditions
 
 
 class Item(object):
@@ -71,7 +73,7 @@ class Perishable(Item):
 class NonPerishable(Item):
     def __init__(self, name):
         Item.__init__(self, name)
-
+# top level of GUI builds a frame containg all other frames
 class GUI(tk.Tk):
     
     def __init__(self, *args, **kwargs):
@@ -95,21 +97,28 @@ class GUI(tk.Tk):
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame(MainGui)
-        
+      
     def show_frame(self, cont):
         
         frame = self.frames[cont]        
         frame.tkraise()
         
         
-                
+# Main page of GUI has the list of item and buttons to add items                
 class MainGui(tk.Frame):
     
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
         label = tk.Label(self, text="Kitchen Gadget", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
-        alist = updateList()
+        # if statment to clear the list using a global variable
+        if (not CLEAR_LIST):
+            alist = updateList()
+            alist = sortitems(alist)
+        else:
+            global CLEAR_LIST
+            alist = []
+            CLEAR_LIST = False
         
         if (len(alist) <= 10):
             for i in range(len(alist)):
@@ -151,7 +160,7 @@ class MainGui(tk.Frame):
         removebutton = tk.Button(self, text =  "Remove Item", fg = "black",\
                               width = WIDTH,height = (HEIGHT))
         removebutton.pack(side = "left")
-
+# GUI for when add button is pressed
 class ADD(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -165,7 +174,7 @@ class ADD(tk.Frame):
         button2 = tk.Button(self, text="Manual",
                             command=lambda: controller.show_frame(Manual))
         button2.pack()
-
+#GUI for when add->Manual is pressed
 class Manual(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -176,6 +185,7 @@ class Manual(tk.Frame):
         day = 1
         year =1
         global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+        # function that is called when enter button is pushed
         def callback():
             global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
             NAME_CHECK = e1.get()
@@ -187,14 +197,17 @@ class Manual(tk.Frame):
                 DAY_CHECK = day
                 YEAR_CHECK = year
                 MANUAL_CHECK = 1
+            # needed to reset the frame ********************************
             frame = Manual(parent,controller)
 
             controller.frames[Manual] = frame
 
             frame.grid(row=0, column=0, sticky="nsew")
             controller.frames.update
-            
+            #**************************************************************
+            # calls function to show a specific frame
             controller.show_frame(Manual)
+        # function called when submit button is pushed
         def callbacksubmit():
             global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
             exp = date(YEAR_CHECK, MOUNTH_CHECK, DAY_CHECK)
@@ -248,7 +261,7 @@ class Manual(tk.Frame):
             submitbutton = tk.Button(self, text="submit",
                             command = callbacksubmit)
             submitbutton.pack()
-
+# GUI for when ADD->SCAN is pressed
 class SCAN(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -259,6 +272,7 @@ class SCAN(tk.Frame):
         day = 1
         year =1
         global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+        # when scan is pressed calls the scan fuction then checks to se if a valid barcode is there
         def callbackscan():
             global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
             barcode = encodeBarcode()    
@@ -281,6 +295,7 @@ class SCAN(tk.Frame):
             controller.frames.update
             
             controller.show_frame(SCAN)
+        # after all entery windows are filled out this funchion checks to make shure all good
         def callback():
             global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
             
@@ -301,6 +316,7 @@ class SCAN(tk.Frame):
             controller.frames.update
             
             controller.show_frame(SCAN)
+        # creates the items and saves them to external file
         def callbacksubmit():
             global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
             exp = date(YEAR_CHECK, MOUNTH_CHECK, DAY_CHECK)
@@ -442,11 +458,12 @@ def additem(alist,exp):
     item = Perishable(name, experation)
     alist.append(item)
     return name
+# manualy adds item !! what is used whith the GUI !!
 def additemManual(alist, name, experation):
     item = Perishable(name, experation)
     alist.append(item)
     return alist
-    
+# function to sort the list    
 def sortitems(alist):
     n = len(alist)
     for i in range(0, n-1):
@@ -459,32 +476,34 @@ def sortitems(alist):
         alist[minpos] = temp
         
     return alist
+# a function to load the saved files to a list
 def updateList():
     alist = loaddata(SAVEFILE)
     for i in range(len(alist)):
         alist[i].updateEXP()
     return alist
     
-######## some test code ########
-# sample barcodes 054500193243 ,
-
-print "The curent list is as follows"
-
-#alist = updateList()
-for i in range(len(alist)):
-    print alist[i]
+######## MAIN CODE ########
 
 
-##alist = additem(alist)
-alist = sortitems(alist)
 
 
-print " \nThe list after addind a new item"
-for i in range(len(alist)):
-    print alist[i]
+if (DEBUG):
+    alist = updateList()  
+    alist = sortitems(alist)
+    print "The curent list at startup is as follows"
+    for i in range(len(alist)):
+        print alist[i]
 
 
-savedata(alist, SAVEFILE)
+
+
+
+
+
+
+
+
 window = tk
 window = GUI()
 
@@ -493,8 +512,10 @@ window.title("Kitchen")
 
 
 window.mainloop()
-for i in range(len(alist)):
-    print alist[i]
+if (DEBUG):
+    print " \nThe list after closing GUI"
+    for i in range(len(alist)):
+        print alist[i]
 
 ### old code used to run test
 ##print "#"*30
