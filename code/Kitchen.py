@@ -68,7 +68,7 @@ class NonPerishable(Item):
         Item.__init__(self, name)
 
 class GUI(tk.Tk):
-    
+    print "in GUI"
     def __init__(self, *args, **kwargs):
         
         tk.Tk.__init__(self, *args, **kwargs)
@@ -92,17 +92,20 @@ class GUI(tk.Tk):
         self.show_frame(MainGui)
         
     def show_frame(self, cont):
-        #frame = cont(container,self)
+        print "gui show_fram {}".format(cont)
         frame = self.frames[cont]        
         frame.tkraise()
         
+        
                 
 class MainGui(tk.Frame):
+    print "mainGui"
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
         label = tk.Label(self, text="Kitchen Gadget", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
         alist = updateList()
+        print "mainGUI2"
         if (len(alist) <= 10):
             for i in range(len(alist)):
                 if (alist[i].time_left <= 5):
@@ -174,6 +177,13 @@ class Manual(tk.Frame):
             year = int(e4.get())
             exp = date(year, month, day)
             alist = additemManual(alist, name, exp)
+            savedata(alist, SAVEFILE)
+            frame = MainGui(parent,controller)
+
+            controller.frames[MainGui] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
             for i in range(len(alist)):
                 print alist[i]
             
@@ -351,7 +361,7 @@ def updateList():
 
 print "The curent list is as follows"
 
-alist = updateList()
+#alist = updateList()
 for i in range(len(alist)):
     print alist[i]
 
@@ -366,7 +376,7 @@ for i in range(len(alist)):
 
 
 savedata(alist, SAVEFILE)
-
+window = tk
 window = GUI()
 
 ##window.title("Kitchen")
