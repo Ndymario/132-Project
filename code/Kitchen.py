@@ -18,13 +18,20 @@ sys.path.insert(1, "./Experation_Tracker")
 # Import helper python files
 from barcodeScanner3function import *
 #from experation_date_tracker import *
-
-DEBUG = True
+# global variables
+DEBUG = False
+CLEAR_LIST = True # Make true if you want the list clear each time the program is run
+                  # make False if you want to bring back the last items enterd
 SAVEFILE = "Rick"
 alist = []
 WIDTH = 30
 HEIGHT = 10
 LARGE_FONT= ("Verdana", 12)
+NAME_CHECK = "name"
+MOUNTH_CHECK = "between 1 and 12"
+DAY_CHECK = "pick an apropriat day"
+YEAR_CHECK = "greater thatn this year"
+MANUAL_CHECK = 0 # a variable that lets certan buttons show up under right conditions
 
 
 class Item(object):
@@ -66,7 +73,7 @@ class Perishable(Item):
 class NonPerishable(Item):
     def __init__(self, name):
         Item.__init__(self, name)
-
+# top level of GUI builds a frame containg all other frames
 class GUI(tk.Tk):
     
     def __init__(self, *args, **kwargs):
@@ -80,8 +87,8 @@ class GUI(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-
-        for F in [MainGui, ADD, Manual, Manual1]:
+        # creates the GUE "manual add each page to the list
+        for F in [MainGui, ADD, Manual, SCAN]:
 
             frame = F(container,self)
 
@@ -90,19 +97,29 @@ class GUI(tk.Tk):
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame(MainGui)
-        
+      
     def show_frame(self, cont):
-        #frame = cont(container,self)
+        
         frame = self.frames[cont]        
         frame.tkraise()
         
-                
+        
+# Main page of GUI has the list of item and buttons to add items                
 class MainGui(tk.Frame):
+    
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
         label = tk.Label(self, text="Kitchen Gadget", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
-        alist = updateList()
+        # if statment to clear the list using a global variable
+        if (not CLEAR_LIST):
+            alist = updateList()
+            alist = sortitems(alist)
+        else:
+            global CLEAR_LIST
+            alist = []
+            CLEAR_LIST = False
+        
         if (len(alist) <= 10):
             for i in range(len(alist)):
                 if (alist[i].time_left <= 5):
@@ -121,10 +138,12 @@ class MainGui(tk.Frame):
             for i in range(10):
                 if (alist[i].time_left <= 5):
                     BG = "red"
+                elif (alist[i].time_left <= 10):
+                    BG = "yellow"
                 else:
                     BG = "green"
                 TX = "{}  EXPERATION: {}".format(alist[i].name,alist[i].experationDate)
-                text_frame = tk.Label(self.master,text = "{}".format(TX), bg = "{}".format(BG),\
+                text_frame = tk.Label(self,text = "{}".format(TX), bg = "{}".format(BG),\
                                    width = WIDTH, height = HEIGHT/8)
 
                 text_frame.pack(side = "top", fill = "x")
@@ -141,7 +160,7 @@ class MainGui(tk.Frame):
         removebutton = tk.Button(self, text =  "Remove Item", fg = "black",\
                               width = WIDTH,height = (HEIGHT))
         removebutton.pack(side = "left")
-
+# GUI for when add button is pressed
 class ADD(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -149,13 +168,13 @@ class ADD(tk.Frame):
         label.pack(pady=10,padx=10)
 
         button1 = tk.Button(self, text="Scan",
-                            command=lambda: controller.show_frame(MainGui))
+                            command=lambda: controller.show_frame(SCAN))
         button1.pack()
 
         button2 = tk.Button(self, text="Manual",
                             command=lambda: controller.show_frame(Manual))
         button2.pack()
-
+#GUI for when add->Manual is pressed
 class Manual(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -165,92 +184,201 @@ class Manual(tk.Frame):
         month =1
         day = 1
         year =1
-        
+        global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+        # function that is called when enter button is pushed
         def callback():
-            global alist
-            name = e1.get()
+            global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+            NAME_CHECK = e1.get()
             month = int(e2.get())
             day = int(e3.get())
             year = int(e4.get())
-            exp = date(year, month, day)
-            alist = additemManual(alist, name, exp)
-            for i in range(len(alist)):
-                print alist[i]
+            if (month <= 12 and day <= 31 and year >= 2020):                
+                MOUNTH_CHECK = month                       
+                DAY_CHECK = day
+                YEAR_CHECK = year
+                MANUAL_CHECK = 1
+            # needed to reset the frame ********************************
+            frame = Manual(parent,controller)
+
+            controller.frames[Manual] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+            #**************************************************************
+            # calls function to show a specific frame
+            controller.show_frame(Manual)
+        # function called when submit button is pushed
+        def callbacksubmit():
+            global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+            exp = date(YEAR_CHECK, MOUNTH_CHECK, DAY_CHECK)
+            alist = additemManual(alist, NAME_CHECK, exp)
+            savedata(alist, SAVEFILE)
+            MANUAL_CHECK = 0
+            frame = Manual(parent,controller)
+
+            controller.frames[Manual] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+            frame = MainGui(parent,controller)
+
+            controller.frames[MainGui] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
             
-            controller.show_frame(Manual1)
+            controller.show_frame(MainGui)
         l1 = tk.Label(self, text= "Name: ")
         l1.pack()
-        e1 = tk.Entry(self, bg ="white")
+        
+        e1 = tk.Entry(self, textvariable = "1", bg ="white")
+        #e1.insert(0, "{}".format(NAME_CHECK))
         e1.pack()
         
         l2 = tk.Label(self, text= "Month: ")
         l2.pack()
-        e2 = tk.Entry(self, bg ="white")
+        e2 = tk.Entry(self, textvariable= "2", bg ="white")
+        #e2.insert(0, "{}".format(MOUNTH_CHECK))
         e2.pack()
 
         l3 = tk.Label(self, text= "Day: ")
         l3.pack()
-        e3 = tk.Entry(self, bg ="white")
+        e3 = tk.Entry(self, textvariable= "3", bg ="white")
+        #e3.insert(0, "{}".format(DAY_CHECK))
         e3.pack()
 
         l4 = tk.Label(self, text= "Year: ")
         l4.pack()
-        e4 = tk.Entry(self, bg ="white")
+        e4 = tk.Entry(self, textvariable= "4", bg ="white")
+        #e4.insert(0, "{}".format(YEAR_CHECK))
         e4.pack()
 
         button1 = tk.Button(self, text="ENTER",
                             command = callback)
         button1.pack()
         
-        
-            
-class Manual1(tk.Frame):
+        if (MANUAL_CHECK == 1):
+            submitbutton = tk.Button(self, text="submit",
+                            command = callbacksubmit)
+            submitbutton.pack()
+# GUI for when ADD->SCAN is pressed
+class SCAN(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Manualy enter item", font=LARGE_FONT)
+        label = tk.Label(self, text="SCAN AN item", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
-        
-        
+        name = 1
+        month =1
+        day = 1
+        year =1
+        global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+        # when scan is pressed calls the scan fuction then checks to se if a valid barcode is there
+        def callbackscan():
+            global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+            barcode = encodeBarcode()    
+            count = 0
+            if (DEBUG):
+                print "(scan)barcode = {}".format(barcode)
+            if (barcode == None):        
+                count = 1
+                barcode = encodeBarcode()
+            if (count == 1 and barcode == None):
+                name = "cant get name enter manual"
+            else:       
+                name = lookupname(barcode)
+                NAME_CHECK = name
+            frame = SCAN(parent,controller)
+
+            controller.frames[SCAN] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+            
+            controller.show_frame(SCAN)
+        # after all entery windows are filled out this funchion checks to make shure all good
         def callback():
-            print Manual.e1.get()
-            pass
-            name = e1.get()
-            month = e2.get()
-            day = e3.get()
-            year = e4.get()
-            controller.show_frame(Manual1)
-        l1 = tk.Label(self, text= "Name: ")
+            global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+            
+            NAME_CHECK = e1.get()
+            month = int(e2.get())
+            day = int(e3.get())
+            year = int(e4.get())
+            if (month <= 12 and day <= 31 and year >= 2020):                
+                MOUNTH_CHECK = month                       
+                DAY_CHECK = day
+                YEAR_CHECK = year
+                MANUAL_CHECK = 1
+            frame = SCAN(parent,controller)
+
+            controller.frames[SCAN] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+            
+            controller.show_frame(SCAN)
+        # creates the items and saves them to external file
+        def callbacksubmit():
+            global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+            exp = date(YEAR_CHECK, MOUNTH_CHECK, DAY_CHECK)
+            alist = additemManual(alist, NAME_CHECK, exp)
+            savedata(alist, SAVEFILE)
+            MANUAL_CHECK = 0
+            frame = SCAN(parent,controller)
+
+            controller.frames[SCAN] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+            frame = MainGui(parent,controller)
+
+            controller.frames[MainGui] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+            
+            controller.show_frame(MainGui)
+        if (MANUAL_CHECK == 0):
+            namecheck = "press scan if incoretct enter name"
+        else:
+            namecheck = "name"
+        l1 = tk.Label(self, text= "{}".format(namecheck))
         l1.pack()
+        
         e1 = tk.Entry(self, bg ="white")
+        e1.insert(0, "{}".format(NAME_CHECK))
         e1.pack()
         
         l2 = tk.Label(self, text= "Month: ")
         l2.pack()
-        e2 = tk.Entry(self, bg ="white")
+        e2 = tk.Entry(self, textvariable= "2", bg ="white")
+        #e2.insert(0, "{}".format(MOUNTH_CHECK))
         e2.pack()
 
         l3 = tk.Label(self, text= "Day: ")
         l3.pack()
-        e3 = tk.Entry(self, bg ="white")
+        e3 = tk.Entry(self, textvariable= "3", bg ="white")
+        #e3.insert(0, "{}".format(DAY_CHECK))
         e3.pack()
 
         l4 = tk.Label(self, text= "Year: ")
         l4.pack()
-        e4 = tk.Entry(self, bg ="white")
+        e4 = tk.Entry(self, textvariable= "4", bg ="white")
+        #e4.insert(0, "{}".format(YEAR_CHECK))
         e4.pack()
 
         button1 = tk.Button(self, text="ENTER",
                             command = callback)
         button1.pack()
-                
-        button2 = tk.Button(self, text="NEXT",
-                            command = lambda: controller.show_frame(MainGui))
-        button2.pack()
-        name = e1.get()
-        month = e2.get()
-        day = e3.get()
-        year = e4.get()
-        print name
+        scan = tk.Button(self, text="scan",
+                            command = callbackscan)
+        scan.pack()
+        
+        if (MANUAL_CHECK == 1):
+            submitbutton = tk.Button(self, text="submit",
+                            command = callbacksubmit)
+            submitbutton.pack()            
+            
+
         
 ###################### other def #########################
 
@@ -272,7 +400,7 @@ def lookupname(barcode):
     if (DEBUG):
         print "(lookupname) item_name = {}".format(item_name)
     bcheck = item_name.text.strip()
-    name = namecheck(bcheck)
+    name = bcheck
     return name
 # a function to check to see if the barcode was corect
 def namecheck(tempname):
@@ -314,20 +442,28 @@ def loaddata(name):
         return alist
 
 # adds an item to the list
-def additem(alist):
-    barcode = encodeBarcode()
+def additem(alist,exp):
+    barcode = encodeBarcode()    
+    count = 0
     if (DEBUG):
         print "(additem)barcode = {}".format(barcode)
-    name = lookupname(barcode)
-    experation = getEXP()
+    if (barcode == None):        
+        count = 1
+        barcode = encodeBarcode()
+    if (count == 1 and barcode == None):
+        name = raw_input("enter name")
+    else:       
+        name = lookupname(barcode)
+    experation = exp
     item = Perishable(name, experation)
     alist.append(item)
-    return alist
+    return name
+# manualy adds item !! what is used whith the GUI !!
 def additemManual(alist, name, experation):
     item = Perishable(name, experation)
     alist.append(item)
     return alist
-    
+# function to sort the list    
 def sortitems(alist):
     n = len(alist)
     for i in range(0, n-1):
@@ -340,43 +476,46 @@ def sortitems(alist):
         alist[minpos] = temp
         
     return alist
+# a function to load the saved files to a list
 def updateList():
     alist = loaddata(SAVEFILE)
     for i in range(len(alist)):
         alist[i].updateEXP()
     return alist
     
-######## some test code ########
-# sample barcodes 054500193243 ,
-
-print "The curent list is as follows"
-
-alist = updateList()
-for i in range(len(alist)):
-    print alist[i]
+######## MAIN CODE ########
 
 
-##alist = additem(alist)
-alist = sortitems(alist)
 
 
-print " \nThe list after addind a new item"
-for i in range(len(alist)):
-    print alist[i]
+if (DEBUG):
+    alist = updateList()  
+    alist = sortitems(alist)
+    print "The curent list at startup is as follows"
+    for i in range(len(alist)):
+        print alist[i]
 
 
-savedata(alist, SAVEFILE)
 
+
+
+
+
+
+
+
+window = tk
 window = GUI()
 
-##window.title("Kitchen")
+window.title("Kitchen")
 
-##p = MainGui(window)
-##p.setupGUI()
+
 
 window.mainloop()
-for i in range(len(alist)):
-    print alist[i]
+if (DEBUG):
+    print " \nThe list after closing GUI"
+    for i in range(len(alist)):
+        print alist[i]
 
 ### old code used to run test
 ##print "#"*30
