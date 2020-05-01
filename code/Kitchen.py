@@ -20,7 +20,7 @@ from barcodeScanner3function import *
 #from experation_date_tracker import *
 # global variables
 DEBUG = False
-CLEAR_LIST = True # Make true if you want the list clear each time the program is run
+CLEAR_LIST = False # Make true if you want the list clear each time the program is run
                   # make False if you want to bring back the last items enterd
 SAVEFILE = "Rick"
 alist = []
@@ -113,6 +113,7 @@ class MainGui(tk.Frame):
         label.pack(pady=10,padx=10)
         # if statment to clear the list using a global variable
         if (not CLEAR_LIST):
+            global alist
             alist = updateList()
             alist = sortitems(alist)
         else:
