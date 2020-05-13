@@ -39,9 +39,6 @@ class Item(object):
     def __init__(self, name):
         self.name = name
         self.today = date.today()
-
-    
-
         
     def __str__(self):
         return "Name: {}".format(self.name)
@@ -69,8 +66,6 @@ class Perishable(Item):
     def __str__(self):
         return "Name: {} \nExperation: {} \nDaysleft: {}".format(self.name, self.experationDate, self.time_left)
         
-
-        
 class NonPerishable(Item):
     def __init__(self, name):
         Item.__init__(self, name)
@@ -89,7 +84,7 @@ class GUI(tk.Tk):
 
         self.frames = {}
         # creates the GUE "manual add each page to the list
-        for F in [MainGui, ADD, Manual, SCAN]:
+        for F in [MainGui, ADD, Manual, SCAN, List, Remove]:
 
             frame = F(container,self)
 
@@ -118,7 +113,6 @@ class MainGui(tk.Frame):
             global alist
             alist = updateList()
             alist = sortitems(alist)
-            
             
         else:
             global CLEAR_LIST
@@ -154,6 +148,7 @@ class MainGui(tk.Frame):
 
                 text_frame.pack(side = "top", fill = "x")
                 text_frame.pack_propagate(False)
+                
         NAME_CHECK = ""
         MONTH_CHECK = "{}".format(TODAY.month)
         DAY_CHECK = "{}".format(TODAY.day)
@@ -163,17 +158,17 @@ class MainGui(tk.Frame):
         addbutton.pack(side = "left")
 
         listbutton = tk.Button(self, text =  "list", fg = "black", width = WIDTH\
-                            ,height = (HEIGHT))
+                            ,height = (HEIGHT), command=lambda: controller.show_frame(List))
         listbutton.pack(side = "left")
 
         removebutton = tk.Button(self, text =  "Remove Item", fg = "black",\
-                              width = WIDTH,height = (HEIGHT))
+                              width = WIDTH,height = (HEIGHT), command=lambda: controller.show_frame(Remove))
         removebutton.pack(side = "left")
 # GUI for when add button is pressed
 class ADD(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="How to enter item", font=LARGE_FONT)
+        label = tk.Label(self, text="How would you like to enter the item?", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
 
         def milk():
@@ -236,7 +231,7 @@ class ADD(tk.Frame):
             frame.grid(row=0, column=0, sticky="nsew")
             controller.frames.update
 
-        def cancle():
+        def cancel():
             frame = MainGui(parent,controller)
 
             controller.frames[MainGui] = frame
@@ -267,7 +262,7 @@ class ADD(tk.Frame):
         button5.pack()
         
         cancel = tk.Button(self, text="Cancel",
-                            command= cancle)
+                            command= cancel)
         cancel.pack()
 #GUI for when add->Manual is pressed
 class Manual(tk.Frame):
@@ -323,7 +318,7 @@ class Manual(tk.Frame):
             controller.frames.update
             
             controller.show_frame(MainGui)
-        def cancle():
+        def cancel():
             frame = MainGui(parent,controller)
 
             controller.frames[MainGui] = frame
@@ -360,7 +355,7 @@ class Manual(tk.Frame):
         button1.pack()
 
         cancel = tk.Button(self, text="Cancel",
-                            command= cancle)
+                            command= cancel)
         cancel.pack()
         
         if (MANUAL_CHECK == 1):
@@ -449,7 +444,7 @@ class SCAN(tk.Frame):
             namecheck = "press scan if incoretct enter name"
         else:
             namecheck = "name"
-        def cancle():
+        def cancel():
             frame = MainGui(parent,controller)
 
             controller.frames[MainGui] = frame
@@ -489,7 +484,7 @@ class SCAN(tk.Frame):
         scan.pack()
 
         cancel = tk.Button(self, text="Cancel",
-                            command= cancle)
+                            command= cancel)
         cancel.pack()
         
         if (MANUAL_CHECK == 1):
@@ -497,7 +492,43 @@ class SCAN(tk.Frame):
                             command = callbacksubmit)
             submitbutton.pack()            
             
+# Add GUI for viewing the entire list
+class List(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="Here are all of the foods stored inside of the list:", font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
 
+        def cancel():
+            frame = MainGui(parent,controller)
+
+            controller.frames[MainGui] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+        
+        cancel = tk.Button(self, text="Back",
+                            command= cancel)
+        cancel.pack()
+
+# Add GUI for removing from the list
+class Remove(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="What would you like to remove?", font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+
+        def cancel():
+            frame = MainGui(parent,controller)
+
+            controller.frames[MainGui] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+        
+        cancel = tk.Button(self, text="Back",
+                            command= cancel)
+        cancel.pack()
         
 ###################### other def #########################
 
