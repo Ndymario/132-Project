@@ -20,17 +20,18 @@ from barcodeScanner3function import *
 #from experation_date_tracker import *
 # global variables
 DEBUG = False
-CLEAR_LIST = True # Make true if you want the list clear each time the program is run
+CLEAR_LIST = False # Make true if you want the list clear each time the program is run
                   # make False if you want to bring back the last items enterd
 SAVEFILE = "Rick"
 alist = []
 WIDTH = 30
 HEIGHT = 10
 LARGE_FONT= ("Verdana", 12)
-NAME_CHECK = "name"
-MOUNTH_CHECK = "between 1 and 12"
-DAY_CHECK = "pick an apropriat day"
-YEAR_CHECK = "greater thatn this year"
+TODAY = date.today()
+NAME_CHECK = ""
+MONTH_CHECK = "{}".format(TODAY.month)
+DAY_CHECK = "{}".format(TODAY.day)
+YEAR_CHECK = "{}".format(TODAY.year)
 MANUAL_CHECK = 0 # a variable that lets certan buttons show up under right conditions
 
 
@@ -108,18 +109,23 @@ class GUI(tk.Tk):
 class MainGui(tk.Frame):
     
     def __init__(self, parent, controller):
+        global NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, TODAY
         tk.Frame.__init__(self,parent)
         label = tk.Label(self, text="Kitchen Gadget", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
         # if statment to clear the list using a global variable
         if (not CLEAR_LIST):
+            global alist
             alist = updateList()
             alist = sortitems(alist)
+            
+            
         else:
             global CLEAR_LIST
             alist = []
             CLEAR_LIST = False
-        
+        if (DEBUG):
+            print "(MainGui) clear_list -> {}".format(CLEAR_LIST)
         if (len(alist) <= 10):
             for i in range(len(alist)):
                 if (alist[i].time_left <= 5):
@@ -148,7 +154,10 @@ class MainGui(tk.Frame):
 
                 text_frame.pack(side = "top", fill = "x")
                 text_frame.pack_propagate(False)
-        
+        NAME_CHECK = ""
+        MONTH_CHECK = "{}".format(TODAY.month)
+        DAY_CHECK = "{}".format(TODAY.day)
+        YEAR_CHECK = "{}".format(TODAY.year)
         addbutton = tk.Button(self, text =  "Add Item", fg = "black", width = (WIDTH)\
                            , height = (HEIGHT), command=lambda: controller.show_frame(ADD))
         addbutton.pack(side = "left")
@@ -167,6 +176,76 @@ class ADD(tk.Frame):
         label = tk.Label(self, text="How to enter item", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
 
+        def milk():
+            global NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, TODAY
+            if (DAY_CHECK <= "18"):
+                DAY_CHECK = "{}".format((TODAY.day + 10))
+            else:
+                MONTH_CHECK = "{}".format(TODAY.month + 1)
+                DAY_CHECK = "{}".format(((TODAY.day + 10) - 28))
+                if (MONTH_CHECK =="13"):
+                    MONTH_CHECK = "1"
+                if DAY_CHECK == "0":
+                    DAY_CHECK = "1"
+            NAME_CHECK = "Milk"        
+
+            frame = Manual(parent,controller)
+
+            controller.frames[Manual] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+
+        def bread():
+            global NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, TODAY
+            if (DAY_CHECK <= "18"):
+                DAY_CHECK = "{}".format((TODAY.day + 10))
+            else:
+                MONTH_CHECK = "{}".format(TODAY.month + 1)
+                DAY_CHECK = "{}".format(((TODAY.day + 10) - 28))
+                if (MONTH_CHECK =="13"):
+                    MONTH_CHECK = "1"
+                if DAY_CHECK == "0":
+                    DAY_CHECK = "1"
+            NAME_CHECK = "Bread"        
+
+            frame = Manual(parent,controller)
+
+            controller.frames[Manual] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+
+        def leftover():
+            global NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, TODAY
+            if (DAY_CHECK <= "21"):
+                DAY_CHECK = "{}".format((TODAY.day + 7))
+            else:
+                MONTH_CHECK = "{}".format(TODAY.month + 1)
+                DAY_CHECK = "{}".format(((TODAY.day + 7) - 28))
+                if (MONTH_CHECK =="13"):
+                    MONTH_CHECK = "1"
+                if DAY_CHECK == "0":
+                    DAY_CHECK = "1"
+            NAME_CHECK = "Leftovers"       
+
+            frame = Manual(parent,controller)
+
+            controller.frames[Manual] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+
+        def cancle():
+            frame = MainGui(parent,controller)
+
+            controller.frames[MainGui] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+            
+            
+
         button1 = tk.Button(self, text="Scan",
                             command=lambda: controller.show_frame(SCAN))
         button1.pack()
@@ -174,6 +253,22 @@ class ADD(tk.Frame):
         button2 = tk.Button(self, text="Manual",
                             command=lambda: controller.show_frame(Manual))
         button2.pack()
+        
+        button3 = tk.Button(self, text="Milk",
+                            command= milk)
+        button3.pack()
+        
+        button4 = tk.Button(self, text="Bread",
+                            command= bread)
+        button4.pack()
+
+        button5 = tk.Button(self, text="Leftovers",
+                            command= leftover)
+        button5.pack()
+        
+        cancel = tk.Button(self, text="Cancel",
+                            command= cancle)
+        cancel.pack()
 #GUI for when add->Manual is pressed
 class Manual(tk.Frame):
     def __init__(self, parent, controller):
@@ -184,16 +279,16 @@ class Manual(tk.Frame):
         month =1
         day = 1
         year =1
-        global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+        global alist, NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
         # function that is called when enter button is pushed
         def callback():
-            global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+            global alist, NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
             NAME_CHECK = e1.get()
             month = int(e2.get())
             day = int(e3.get())
             year = int(e4.get())
             if (month <= 12 and day <= 31 and year >= 2020):                
-                MOUNTH_CHECK = month                       
+                MONTH_CHECK = month                       
                 DAY_CHECK = day
                 YEAR_CHECK = year
                 MANUAL_CHECK = 1
@@ -209,8 +304,8 @@ class Manual(tk.Frame):
             controller.show_frame(Manual)
         # function called when submit button is pushed
         def callbacksubmit():
-            global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
-            exp = date(YEAR_CHECK, MOUNTH_CHECK, DAY_CHECK)
+            global alist, NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+            exp = date(YEAR_CHECK, MONTH_CHECK, DAY_CHECK)
             alist = additemManual(alist, NAME_CHECK, exp)
             savedata(alist, SAVEFILE)
             MANUAL_CHECK = 0
@@ -228,34 +323,45 @@ class Manual(tk.Frame):
             controller.frames.update
             
             controller.show_frame(MainGui)
+        def cancle():
+            frame = MainGui(parent,controller)
+
+            controller.frames[MainGui] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
         l1 = tk.Label(self, text= "Name: ")
         l1.pack()
         
-        e1 = tk.Entry(self, textvariable = "1", bg ="white")
-        #e1.insert(0, "{}".format(NAME_CHECK))
+        e1 = tk.Entry(self, bg ="white")
+        e1.insert(0, "{}".format(NAME_CHECK))
         e1.pack()
         
         l2 = tk.Label(self, text= "Month: ")
         l2.pack()
-        e2 = tk.Entry(self, textvariable= "2", bg ="white")
-        #e2.insert(0, "{}".format(MOUNTH_CHECK))
+        e2 = tk.Entry(self, bg ="white")
+        e2.insert(0, "{}".format(MONTH_CHECK))
         e2.pack()
 
         l3 = tk.Label(self, text= "Day: ")
         l3.pack()
-        e3 = tk.Entry(self, textvariable= "3", bg ="white")
-        #e3.insert(0, "{}".format(DAY_CHECK))
+        e3 = tk.Entry(self, bg ="white")
+        e3.insert(0, "{}".format(DAY_CHECK))
         e3.pack()
 
         l4 = tk.Label(self, text= "Year: ")
         l4.pack()
-        e4 = tk.Entry(self, textvariable= "4", bg ="white")
-        #e4.insert(0, "{}".format(YEAR_CHECK))
+        e4 = tk.Entry(self, bg ="white")
+        e4.insert(0, "{}".format(YEAR_CHECK))
         e4.pack()
 
         button1 = tk.Button(self, text="ENTER",
                             command = callback)
         button1.pack()
+
+        cancel = tk.Button(self, text="Cancel",
+                            command= cancle)
+        cancel.pack()
         
         if (MANUAL_CHECK == 1):
             submitbutton = tk.Button(self, text="submit",
@@ -271,10 +377,10 @@ class SCAN(tk.Frame):
         month =1
         day = 1
         year =1
-        global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+        global alist, NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
         # when scan is pressed calls the scan fuction then checks to se if a valid barcode is there
         def callbackscan():
-            global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+            global alist, NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
             barcode = encodeBarcode()    
             count = 0
             if (DEBUG):
@@ -287,6 +393,8 @@ class SCAN(tk.Frame):
             else:       
                 name = lookupname(barcode)
                 NAME_CHECK = name
+                DAY_CHECK = ""
+                MONTH_CHECK = ""
             frame = SCAN(parent,controller)
 
             controller.frames[SCAN] = frame
@@ -297,14 +405,14 @@ class SCAN(tk.Frame):
             controller.show_frame(SCAN)
         # after all entery windows are filled out this funchion checks to make shure all good
         def callback():
-            global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+            global alist, NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
             
             NAME_CHECK = e1.get()
             month = int(e2.get())
             day = int(e3.get())
             year = int(e4.get())
             if (month <= 12 and day <= 31 and year >= 2020):                
-                MOUNTH_CHECK = month                       
+                MONTH_CHECK = month                       
                 DAY_CHECK = day
                 YEAR_CHECK = year
                 MANUAL_CHECK = 1
@@ -318,8 +426,8 @@ class SCAN(tk.Frame):
             controller.show_frame(SCAN)
         # creates the items and saves them to external file
         def callbacksubmit():
-            global alist, NAME_CHECK, MOUNTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
-            exp = date(YEAR_CHECK, MOUNTH_CHECK, DAY_CHECK)
+            global alist, NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, MANUAL_CHECK
+            exp = date(YEAR_CHECK, MONTH_CHECK, DAY_CHECK)
             alist = additemManual(alist, NAME_CHECK, exp)
             savedata(alist, SAVEFILE)
             MANUAL_CHECK = 0
@@ -341,6 +449,13 @@ class SCAN(tk.Frame):
             namecheck = "press scan if incoretct enter name"
         else:
             namecheck = "name"
+        def cancle():
+            frame = MainGui(parent,controller)
+
+            controller.frames[MainGui] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
         l1 = tk.Label(self, text= "{}".format(namecheck))
         l1.pack()
         
@@ -350,20 +465,20 @@ class SCAN(tk.Frame):
         
         l2 = tk.Label(self, text= "Month: ")
         l2.pack()
-        e2 = tk.Entry(self, textvariable= "2", bg ="white")
-        #e2.insert(0, "{}".format(MOUNTH_CHECK))
+        e2 = tk.Entry(self, bg ="white")
+        e2.insert(0, "{}".format(MONTH_CHECK))
         e2.pack()
 
         l3 = tk.Label(self, text= "Day: ")
         l3.pack()
-        e3 = tk.Entry(self, textvariable= "3", bg ="white")
-        #e3.insert(0, "{}".format(DAY_CHECK))
+        e3 = tk.Entry(self, bg ="white")
+        e3.insert(0, "{}".format(DAY_CHECK))
         e3.pack()
 
         l4 = tk.Label(self, text= "Year: ")
         l4.pack()
-        e4 = tk.Entry(self, textvariable= "4", bg ="white")
-        #e4.insert(0, "{}".format(YEAR_CHECK))
+        e4 = tk.Entry(self, bg ="white")
+        e4.insert(0, "{}".format(YEAR_CHECK))
         e4.pack()
 
         button1 = tk.Button(self, text="ENTER",
@@ -372,6 +487,10 @@ class SCAN(tk.Frame):
         scan = tk.Button(self, text="scan",
                             command = callbackscan)
         scan.pack()
+
+        cancel = tk.Button(self, text="Cancel",
+                            command= cancle)
+        cancel.pack()
         
         if (MANUAL_CHECK == 1):
             submitbutton = tk.Button(self, text="submit",
