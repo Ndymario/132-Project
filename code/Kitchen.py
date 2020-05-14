@@ -26,7 +26,14 @@ SAVEFILE = "Rick"
 alist = []
 WIDTH = 30
 HEIGHT = 10
-LARGE_FONT= ("Verdana", 12)
+STYLE = "Arial"
+LARGE_FONT = (STYLE, 12)
+
+# Variables for buttons on home screen
+BUTTON_FONT = (STYLE, 17)
+BUTTON_HEIGHT = 5
+BUTTON_WIDTH = 15
+
 TODAY = date.today()
 NAME_CHECK = ""
 MONTH_CHECK = "{}".format(TODAY.month)
@@ -106,7 +113,7 @@ class MainGui(tk.Frame):
     def __init__(self, parent, controller):
         global NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, TODAY
         tk.Frame.__init__(self,parent)
-        label = tk.Label(self, text="Kitchen Gadget", font=LARGE_FONT)
+        label = tk.Label(self, text="Kitchen Gadget", font = LARGE_FONT)
         label.pack(pady=10,padx=10)
         # if statment to clear the list using a global variable
         if (not CLEAR_LIST):
@@ -153,16 +160,16 @@ class MainGui(tk.Frame):
         MONTH_CHECK = "{}".format(TODAY.month)
         DAY_CHECK = "{}".format(TODAY.day)
         YEAR_CHECK = "{}".format(TODAY.year)
-        addbutton = tk.Button(self, text =  "Add Item", fg = "black", width = (WIDTH)\
-                           , height = (HEIGHT), command=lambda: controller.show_frame(ADD))
+        addbutton = tk.Button(self, text =  "Add Item", fg = "black", width = (BUTTON_WIDTH)\
+                           , height = (BUTTON_HEIGHT), font = BUTTON_FONT, command=lambda: controller.show_frame(ADD))
         addbutton.pack(side = "left")
 
-        listbutton = tk.Button(self, text =  "list", fg = "black", width = WIDTH\
-                            ,height = (HEIGHT), command=lambda: controller.show_frame(List))
+        listbutton = tk.Button(self, text =  "List", fg = "black", width = BUTTON_WIDTH\
+                            ,height = (BUTTON_HEIGHT), font = BUTTON_FONT, command=lambda: controller.show_frame(List))
         listbutton.pack(side = "left")
 
         removebutton = tk.Button(self, text =  "Remove Item", fg = "black",\
-                              width = WIDTH,height = (HEIGHT), command=lambda: controller.show_frame(Remove))
+                              width = BUTTON_WIDTH, height = (BUTTON_HEIGHT), font = BUTTON_FONT, command=lambda: controller.show_frame(Remove))
         removebutton.pack(side = "left")
 # GUI for when add button is pressed
 class ADD(tk.Frame):
