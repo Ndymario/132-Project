@@ -127,11 +127,11 @@ class MainGui(tk.Frame):
             CLEAR_LIST = False
         if (DEBUG):
             print "(MainGui) clear_list -> {}".format(CLEAR_LIST)
-        if (len(alist) <= 10):
+        if (len(alist) <= 5):
             for i in range(len(alist)):
-                if (alist[i].time_left <= 5):
+                if (alist[i].time_left <= 3):
                     BG = "red"
-                elif (alist[i].time_left <= 10):
+                elif (alist[i].time_left <= 7):
                     BG = "yellow"
                 else:
                     BG = "green"
@@ -142,10 +142,10 @@ class MainGui(tk.Frame):
                 text_frame.pack(side = "top", fill = "x")
                 text_frame.pack_propagate(False)
         else:
-            for i in range(10):
-                if (alist[i].time_left <= 5):
+            for i in range(5):
+                if (alist[i].time_left <= 3):
                     BG = "red"
-                elif (alist[i].time_left <= 10):
+                elif (alist[i].time_left <= 7):
                     BG = "yellow"
                 else:
                     BG = "green"
