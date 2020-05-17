@@ -20,7 +20,7 @@ from barcodeScanner3function import *
 #from experation_date_tracker import *
 # global variables
 DEBUG = False
-CLEAR_LIST = False # Make true if you want the list clear each time the program is run
+CLEAR_LIST = True # Make true if you want the list clear each time the program is run
                   # make False if you want to bring back the last items enterd
 SAVEFILE = "Rick"
 alist = []
