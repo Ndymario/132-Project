@@ -20,7 +20,7 @@ from barcodeScanner3function import *
 #from experation_date_tracker import *
 # global variables
 DEBUG = False
-CLEAR_LIST = True # Make true if you want the list clear each time the program is run
+CLEAR_LIST = False # Make true if you want the list clear each time the program is run
                   # make False if you want to bring back the last items enterd
 SAVEFILE = "Rick"
 alist = []
@@ -505,6 +505,7 @@ class List(tk.Frame):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Here are all of the foods stored inside of the list:", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
+        global alist
 
         def cancel():
             frame = MainGui(parent,controller)
@@ -513,10 +514,33 @@ class List(tk.Frame):
 
             frame.grid(row=0, column=0, sticky="nsew")
             controller.frames.update
+        def refresh():
+            frame = List(parent,controller)
+
+            controller.frames[List] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+
+        listbox = tk.Listbox(self)
+        scrollbar = tk.Scrollbar(listbox, orient = "vertical")
+        listbox.config(yscrollcommand = scrollbar.set)
+        scrollbar.config(command = listbox.yview)
+        scrollbar.pack(side = "right", fill = "y")
+        listbox.pack(side = "left",fill = "both", expand = 1)
+        
+        
+
+        for item in alist:
+            listbox.insert("end", item)
         
         cancel = tk.Button(self, text="Back",
                             command= cancel)
         cancel.pack()
+
+        refresh = tk.Button(self, text="Refresh",
+                            command= refresh)
+        refresh.pack()
 
 # Add GUI for removing from the list
 class Remove(tk.Frame):
