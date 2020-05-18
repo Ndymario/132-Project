@@ -20,7 +20,7 @@ from barcodeScanner3function import *
 
 # global variables
 DEBUG = False
-CLEAR_LIST = False # Make true if you want the list clear each time the program is run
+CLEAR_LIST = True # Make true if you want the list clear each time the program is run
                   # make False if you want to bring back the last items enterd
 SAVEFILE = "Rick"
 alist = []
@@ -519,6 +519,7 @@ class List(tk.Frame):
 
             frame.grid(row=0, column=0, sticky="nsew")
             controller.frames.update
+            
         def refresh():
             frame = List(parent,controller)
 
@@ -553,6 +554,7 @@ class Remove(tk.Frame):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="What would you like to remove?", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
+        global alist
 
         def cancel():
             frame = MainGui(parent,controller)
@@ -561,10 +563,73 @@ class Remove(tk.Frame):
 
             frame.grid(row=0, column=0, sticky="nsew")
             controller.frames.update
+
+        def removeAll():
+            alist = []
+
+            controller.frames[Confirm] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+
+            global remove
+            remove = "all"
+
+        def removeExpired():
+            alist = []
+
+            controller.frames[Confirm] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+
+            global remove
+            remove = "the expired"
         
         cancel = tk.Button(self, text="Back",
                             command= cancel)
         cancel.pack()
+
+        removeExpired = tk.Button(self, text="Remove All",
+                            command= removeAll)
+        removeExpired.pack()
+
+        removeAll = tk.Button(self, text="Remove All",
+                            command= removeAll)
+        removeAll.pack()
+
+# Confirmation for Removing items
+class Confirm(tk.Frame):
+    def __init__(self, parent, controller):
+        global remove
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="Are you sure you want to remove" + remove + "items?", font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+        global alist
+
+    def cancel():
+            frame = MainGui(parent,controller)
+
+            controller.frames[Remove] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+
+    def remove(expired):
+        if (remove == "all"):
+            alist = []
+
+        elif (remove == "the expired"):
+            pass
+
+    remove = tk.Button(text="Yes, I'm sure",
+                            command= remove)
+    remove.pack()
+
+    cancel = tk.Button(text="Wait, nevermind",
+                            command= cancel)
+    cancel.pack()
+        
         
 ###################### other def #########################
 
