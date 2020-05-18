@@ -1,5 +1,5 @@
 #######################################
-# Contributors (to this file):
+# Contributors (to this file): Nolan, Jacob, Josh
 # Date: 04/20/20
 # Description: The main program.
 #######################################
@@ -17,7 +17,7 @@ sys.path.insert(1, "./Experation_Tracker")
 
 # Import helper python files
 from barcodeScanner3function import *
-#from experation_date_tracker import *
+
 # global variables
 DEBUG = False
 CLEAR_LIST = False # Make true if you want the list clear each time the program is run
@@ -41,11 +41,16 @@ DAY_CHECK = "{}".format(TODAY.day)
 YEAR_CHECK = "{}".format(TODAY.year)
 MANUAL_CHECK = 0 # a variable that lets certan buttons show up under right conditions
 
+DEBUG = False
+SAVEFILE = "Rick"
 
 class Item(object):
     def __init__(self, name):
         self.name = name
         self.today = date.today()
+
+    
+
         
     def __str__(self):
         return "Name: {}".format(self.name)
@@ -582,6 +587,7 @@ def lookupname(barcode):
         print "(lookupname) item_name = {}".format(item_name)
     bcheck = item_name.text.strip()
     name = bcheck
+
     return name
 # a function to check to see if the barcode was corect
 def namecheck(tempname):
@@ -663,7 +669,7 @@ def updateList():
     for i in range(len(alist)):
         alist[i].updateEXP()
     return alist
-    
+
 ######## MAIN CODE ########
 
 
@@ -676,37 +682,13 @@ if (DEBUG):
     for i in range(len(alist)):
         print alist[i]
 
-
-
-
-
-
-
-
-
-
 window = tk
 window = GUI()
 
 window.title("Kitchen")
-
-
 
 window.mainloop()
 if (DEBUG):
     print " \nThe list after closing GUI"
     for i in range(len(alist)):
         print alist[i]
-
-### old code used to run test
-##print "#"*30
-##name = "test item"
-##experation = getEXP()
-##p1 = Perishable(name, experation)
-##print p1 #sample to print out a parishable item
-##print "today is {}".format(p1.today) # was a sample to print todays date
-##remain = (p1.experationDate - p1.today) # sample to get how much longer till experation
-##print "{} has {} days left".format(p1.name, remain.days) # sample to get the remanig days
-##print p1.time_left
-##p1.updateEXP()
-##print p1.time_left
