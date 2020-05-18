@@ -10,3 +10,6 @@ Wehave decided to go with the "Fridge Companion", the other ideas remain for the
 code/ is where all of our program files are; the heart of the project
 
 ideas/ is where our ideas for the project are; keptfor historical purposes
+
+# IMPORTANT
+Currently the RPI branch has the final version of the project. Kitchen.py is our main code for the project.
