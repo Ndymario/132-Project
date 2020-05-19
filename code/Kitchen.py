@@ -33,7 +33,7 @@ LARGE_FONT = (STYLE, 12)
 BUTTON_FONT = (STYLE, 17)
 BUTTON_HEIGHT = 5
 BUTTON_WIDTH = 15
-
+remove = ""
 TODAY = date.today()
 NAME_CHECK = ""
 MONTH_CHECK = "{}".format(TODAY.month)
@@ -96,7 +96,7 @@ class GUI(tk.Tk):
 
         self.frames = {}
         # creates the GUE "manual add each page to the list
-        for F in [MainGui, ADD, Manual, SCAN, List, Remove]:
+        for F in [MainGui, ADD, Manual, SCAN, List, Remove,Confirm]:
 
             frame = F(container,self)
 
@@ -600,35 +600,34 @@ class Remove(tk.Frame):
 
 # Confirmation for Removing items
 class Confirm(tk.Frame):
+    
     def __init__(self, parent, controller):
-        global remove
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Are you sure you want to remove" + remove + "items?", font=LARGE_FONT)
+        global remove
+        label = tk.Label(self, text="Are you sure you want to remove" + remove + "items", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
         global alist
 
-    def cancel():
+        def cancel():
             frame = MainGui(parent,controller)
-
             controller.frames[Remove] = frame
-
             frame.grid(row=0, column=0, sticky="nsew")
             controller.frames.update
 
-    def remove(expired):
-        if (remove == "all"):
-            alist = []
+        def remove(expired):
+            if (remove == "all"):
+                alist = []
 
-        elif (remove == "the expired"):
-            pass
+            elif (remove == "the expired"):
+                pass
 
-    remove = tk.Button(text="Yes, I'm sure",
-                            command= remove)
-    remove.pack()
+        remove = tk.Button(self, text="Yes, I'm sure",
+                                command= remove)
+        remove.pack()
 
-    cancel = tk.Button(text="Wait, nevermind",
-                            command= cancel)
-    cancel.pack()
+        cancel = tk.Button(self, text="Wait, nevermind",
+                                command= cancel)
+        cancel.pack()
         
         
 ###################### other def #########################
