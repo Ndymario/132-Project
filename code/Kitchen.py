@@ -578,32 +578,17 @@ class Remove(tk.Frame):
 
             for item in alist:
 
-                # Get the date of the oldest item
-                experation = item.experationDate
-
-                expDate = experation.split("/")
-
-                # If the year of the food's experation date is older than the current date, remove it
-                if (expDate[2] < date[2]):
-                    self.itemList.remove(oldestItem)
-
-                # If the month of the food's experation date is older than the current date, remove it
-                elif (expDate[0] < date[0]):
-                    self.itemList.remove(oldestItem)
-
-                # If the day of the food's experation date is older than the current date, remove it
-                elif (expDate[1] < date[1]):
-                    self.itemList.remove(oldestItem)
-
-                # If the food's experation date is todays date, say that the food expires today
-                elif (expDate[0] == date[0] and expDate[1] == date[1]):
-                    print("Your {} expires today!".format(oldestItem))
-
-                # Otherwise, just say nothing has expired
-                else:
-                    print("Nothing has expired!")
+                if (item.time_left == 0):
+                    alist.remove(item)
                     
             savedata(alist, SAVEFILE)
+
+            frame = MainGui(parent,controller)
+
+            controller.frames[MainGui] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
         
         cancel = tk.Button(self, text="Back",
                             command= cancel)
