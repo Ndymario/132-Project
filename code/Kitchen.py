@@ -33,7 +33,7 @@ LARGE_FONT = (STYLE, 12)
 BUTTON_FONT = (STYLE, 17)
 BUTTON_HEIGHT = 5
 BUTTON_WIDTH = 15
-
+remove = ""
 TODAY = date.today()
 NAME_CHECK = ""
 MONTH_CHECK = "{}".format(TODAY.month)
@@ -48,9 +48,6 @@ class Item(object):
     def __init__(self, name):
         self.name = name
         self.today = date.today()
-
-    
-
         
     def __str__(self):
         return "Name: {}".format(self.name)
@@ -81,6 +78,7 @@ class Perishable(Item):
 class NonPerishable(Item):
     def __init__(self, name):
         Item.__init__(self, name)
+
 # top level of GUI builds a frame containg all other frames
 class GUI(tk.Tk):
     
@@ -130,8 +128,10 @@ class MainGui(tk.Frame):
             global CLEAR_LIST
             alist = []
             CLEAR_LIST = False
+            
         if (DEBUG):
             print "(MainGui) clear_list -> {}".format(CLEAR_LIST)
+            
         if (len(alist) <= 5):
             for i in range(len(alist)):
                 if (alist[i].time_left <= 3):
@@ -146,6 +146,7 @@ class MainGui(tk.Frame):
 
                 text_frame.pack(side = "top", fill = "x")
                 text_frame.pack_propagate(False)
+                
         else:
             for i in range(5):
                 if (alist[i].time_left <= 3):
@@ -173,7 +174,7 @@ class MainGui(tk.Frame):
                             ,height = (BUTTON_HEIGHT), font = BUTTON_FONT, command=lambda: controller.show_frame(List))
         listbutton.pack(side = "left")
 
-        removebutton = tk.Button(self, text =  "Remove Item", fg = "black",\
+        removebutton = tk.Button(self, text =  "Remove Expired", fg = "black",\
                               width = BUTTON_WIDTH, height = (BUTTON_HEIGHT), font = BUTTON_FONT, command=lambda: controller.show_frame(Remove))
         removebutton.pack(side = "left")
 # GUI for when add button is pressed
@@ -456,6 +457,7 @@ class SCAN(tk.Frame):
             namecheck = "press scan if incoretct enter name"
         else:
             namecheck = "name"
+            
         def cancel():
             frame = MainGui(parent,controller)
 
@@ -519,6 +521,7 @@ class List(tk.Frame):
 
             frame.grid(row=0, column=0, sticky="nsew")
             controller.frames.update
+            
         def refresh():
             frame = List(parent,controller)
 
@@ -551,10 +554,35 @@ class List(tk.Frame):
 class Remove(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="What would you like to remove?", font=LARGE_FONT)
+        label = tk.Label(self, text="Are you sure you want to remove ALL expired items?", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
+        global alist
 
         def cancel():
+            frame = MainGui(parent,controller)
+
+            controller.frames[MainGui] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+
+        # Function that will remove items when they are expired.
+        def removeExpired():
+            global alist
+            
+            # Get today's date
+            today = datetime.today().strftime('%m/%d/%y')
+
+            # Split the date into Month/Day/Year
+            date = today.split("/")
+
+            for item in alist:
+
+                if (item.time_left <= 0):
+                    alist.remove(item)
+                    
+            savedata(alist, SAVEFILE)
+
             frame = MainGui(parent,controller)
 
             controller.frames[MainGui] = frame
@@ -565,6 +593,11 @@ class Remove(tk.Frame):
         cancel = tk.Button(self, text="Back",
                             command= cancel)
         cancel.pack()
+
+        removeExpired = tk.Button(self, text="Yes, I'm sure",
+                            command= removeExpired)
+        removeExpired.pack()
+        
         
 ###################### other def #########################
 
