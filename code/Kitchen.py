@@ -20,7 +20,7 @@ from barcodeScanner3function import *
 
 # global variables
 DEBUG = False
-CLEAR_LIST = True # Make true if you want the list clear each time the program is run
+CLEAR_LIST = False # Make true if you want the list clear each time the program is run
                   # make False if you want to bring back the last items enterd
 SAVEFILE = "Rick"
 alist = []
@@ -174,7 +174,7 @@ class MainGui(tk.Frame):
                             ,height = (BUTTON_HEIGHT), font = BUTTON_FONT, command=lambda: controller.show_frame(List))
         listbutton.pack(side = "left")
 
-        removebutton = tk.Button(self, text =  "Remove Item", fg = "black",\
+        removebutton = tk.Button(self, text =  "Remove Expired", fg = "black",\
                               width = BUTTON_WIDTH, height = (BUTTON_HEIGHT), font = BUTTON_FONT, command=lambda: controller.show_frame(Remove))
         removebutton.pack(side = "left")
 # GUI for when add button is pressed
