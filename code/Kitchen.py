@@ -578,7 +578,7 @@ class Remove(tk.Frame):
 
             for item in alist:
 
-                if (item.time_left == 0):
+                if (item.time_left <= 0):
                     alist.remove(item)
                     
             savedata(alist, SAVEFILE)
