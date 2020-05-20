@@ -1,5 +1,5 @@
 #######################################
-# Contributors (to this file):
+# Contributors (to this file): Nolan, Jacob, Josh
 # Date: 04/20/20
 # Description: The main program.
 #######################################
@@ -17,7 +17,7 @@ sys.path.insert(1, "./Experation_Tracker")
 
 # Import helper python files
 from barcodeScanner3function import *
-#from experation_date_tracker import *
+
 # global variables
 DEBUG = False
 CLEAR_LIST = False # Make true if you want the list clear each time the program is run
@@ -33,7 +33,7 @@ LARGE_FONT = (STYLE, 12)
 BUTTON_FONT = (STYLE, 17)
 BUTTON_HEIGHT = 5
 BUTTON_WIDTH = 15
-
+remove = ""
 TODAY = date.today()
 NAME_CHECK = ""
 MONTH_CHECK = "{}".format(TODAY.month)
@@ -41,6 +41,8 @@ DAY_CHECK = "{}".format(TODAY.day)
 YEAR_CHECK = "{}".format(TODAY.year)
 MANUAL_CHECK = 0 # a variable that lets certan buttons show up under right conditions
 
+DEBUG = False
+SAVEFILE = "Rick"
 
 class Item(object):
     def __init__(self, name):
@@ -76,6 +78,7 @@ class Perishable(Item):
 class NonPerishable(Item):
     def __init__(self, name):
         Item.__init__(self, name)
+
 # top level of GUI builds a frame containg all other frames
 class GUI(tk.Tk):
     
@@ -113,7 +116,7 @@ class MainGui(tk.Frame):
     def __init__(self, parent, controller):
         global NAME_CHECK, MONTH_CHECK, DAY_CHECK, YEAR_CHECK, TODAY
         tk.Frame.__init__(self,parent)
-        label = tk.Label(self, text="Kitchen Gadget", font = LARGE_FONT)
+        label = tk.Label(self, text="Kitchen Companion", font = LARGE_FONT)
         label.pack(pady=10,padx=10)
         # if statment to clear the list using a global variable
         if (not CLEAR_LIST):
@@ -125,8 +128,10 @@ class MainGui(tk.Frame):
             global CLEAR_LIST
             alist = []
             CLEAR_LIST = False
+            
         if (DEBUG):
             print "(MainGui) clear_list -> {}".format(CLEAR_LIST)
+            
         if (len(alist) <= 5):
             for i in range(len(alist)):
                 if (alist[i].time_left <= 3):
@@ -141,6 +146,7 @@ class MainGui(tk.Frame):
 
                 text_frame.pack(side = "top", fill = "x")
                 text_frame.pack_propagate(False)
+                
         else:
             for i in range(5):
                 if (alist[i].time_left <= 3):
@@ -168,7 +174,7 @@ class MainGui(tk.Frame):
                             ,height = (BUTTON_HEIGHT), font = BUTTON_FONT, command=lambda: controller.show_frame(List))
         listbutton.pack(side = "left")
 
-        removebutton = tk.Button(self, text =  "Remove Item", fg = "black",\
+        removebutton = tk.Button(self, text =  "Remove Expired", fg = "black",\
                               width = BUTTON_WIDTH, height = (BUTTON_HEIGHT), font = BUTTON_FONT, command=lambda: controller.show_frame(Remove))
         removebutton.pack(side = "left")
 # GUI for when add button is pressed
@@ -451,6 +457,7 @@ class SCAN(tk.Frame):
             namecheck = "press scan if incoretct enter name"
         else:
             namecheck = "name"
+            
         def cancel():
             frame = MainGui(parent,controller)
 
@@ -514,6 +521,7 @@ class List(tk.Frame):
 
             frame.grid(row=0, column=0, sticky="nsew")
             controller.frames.update
+            
         def refresh():
             frame = List(parent,controller)
 
@@ -546,10 +554,35 @@ class List(tk.Frame):
 class Remove(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="What would you like to remove?", font=LARGE_FONT)
+        label = tk.Label(self, text="Are you sure you want to remove ALL expired items?", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
+        global alist
 
         def cancel():
+            frame = MainGui(parent,controller)
+
+            controller.frames[MainGui] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+            controller.frames.update
+
+        # Function that will remove items when they are expired.
+        def removeExpired():
+            global alist
+            
+            # Get today's date
+            today = datetime.today().strftime('%m/%d/%y')
+
+            # Split the date into Month/Day/Year
+            date = today.split("/")
+
+            for item in alist:
+
+                if (item.time_left <= 0):
+                    alist.remove(item)
+                    
+            savedata(alist, SAVEFILE)
+
             frame = MainGui(parent,controller)
 
             controller.frames[MainGui] = frame
@@ -560,6 +593,11 @@ class Remove(tk.Frame):
         cancel = tk.Button(self, text="Back",
                             command= cancel)
         cancel.pack()
+
+        removeExpired = tk.Button(self, text="Yes, I'm sure",
+                            command= removeExpired)
+        removeExpired.pack()
+        
         
 ###################### other def #########################
 
@@ -582,6 +620,7 @@ def lookupname(barcode):
         print "(lookupname) item_name = {}".format(item_name)
     bcheck = item_name.text.strip()
     name = bcheck
+
     return name
 # a function to check to see if the barcode was corect
 def namecheck(tempname):
@@ -663,7 +702,7 @@ def updateList():
     for i in range(len(alist)):
         alist[i].updateEXP()
     return alist
-    
+
 ######## MAIN CODE ########
 
 
@@ -676,37 +715,13 @@ if (DEBUG):
     for i in range(len(alist)):
         print alist[i]
 
-
-
-
-
-
-
-
-
-
 window = tk
 window = GUI()
 
 window.title("Kitchen")
-
-
 
 window.mainloop()
 if (DEBUG):
     print " \nThe list after closing GUI"
     for i in range(len(alist)):
         print alist[i]
-
-### old code used to run test
-##print "#"*30
-##name = "test item"
-##experation = getEXP()
-##p1 = Perishable(name, experation)
-##print p1 #sample to print out a parishable item
-##print "today is {}".format(p1.today) # was a sample to print todays date
-##remain = (p1.experationDate - p1.today) # sample to get how much longer till experation
-##print "{} has {} days left".format(p1.name, remain.days) # sample to get the remanig days
-##print p1.time_left
-##p1.updateEXP()
-##print p1.time_left
