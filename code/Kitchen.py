@@ -48,9 +48,6 @@ class Item(object):
     def __init__(self, name):
         self.name = name
         self.today = date.today()
-
-    
-
         
     def __str__(self):
         return "Name: {}".format(self.name)
@@ -81,6 +78,7 @@ class Perishable(Item):
 class NonPerishable(Item):
     def __init__(self, name):
         Item.__init__(self, name)
+
 # top level of GUI builds a frame containg all other frames
 class GUI(tk.Tk):
     
@@ -96,7 +94,7 @@ class GUI(tk.Tk):
 
         self.frames = {}
         # creates the GUE "manual add each page to the list
-        for F in [MainGui, ADD, Manual, SCAN, List, Remove,Confirm]:
+        for F in [MainGui, ADD, Manual, SCAN, List, Remove]:
 
             frame = F(container,self)
 
@@ -130,8 +128,10 @@ class MainGui(tk.Frame):
             global CLEAR_LIST
             alist = []
             CLEAR_LIST = False
+            
         if (DEBUG):
             print "(MainGui) clear_list -> {}".format(CLEAR_LIST)
+            
         if (len(alist) <= 5):
             for i in range(len(alist)):
                 if (alist[i].time_left <= 3):
@@ -146,6 +146,7 @@ class MainGui(tk.Frame):
 
                 text_frame.pack(side = "top", fill = "x")
                 text_frame.pack_propagate(False)
+                
         else:
             for i in range(5):
                 if (alist[i].time_left <= 3):
@@ -456,6 +457,7 @@ class SCAN(tk.Frame):
             namecheck = "press scan if incoretct enter name"
         else:
             namecheck = "name"
+            
         def cancel():
             frame = MainGui(parent,controller)
 
@@ -564,70 +566,52 @@ class Remove(tk.Frame):
             frame.grid(row=0, column=0, sticky="nsew")
             controller.frames.update
 
-        def removeAll():
-            alist = []
-
-            controller.frames[Confirm] = frame
-
-            frame.grid(row=0, column=0, sticky="nsew")
-            controller.frames.update
-
-            global remove
-            remove = "all"
-
+        # Function that will remove items when they are expired.
         def removeExpired():
-            alist = []
+            global alist
+            
+            # Get today's date
+            today = datetime.today().strftime('%m/%d/%y')
 
-            controller.frames[Confirm] = frame
+            # Split the date into Month/Day/Year
+            date = today.split("/")
 
-            frame.grid(row=0, column=0, sticky="nsew")
-            controller.frames.update
+            for item in alist:
 
-            global remove
-            remove = "the expired"
+                # Get the date of the oldest item
+                experation = item.experationDate
+
+                expDate = experation.split("/")
+
+                # If the year of the food's experation date is older than the current date, remove it
+                if (expDate[2] < date[2]):
+                    self.itemList.remove(oldestItem)
+
+                # If the month of the food's experation date is older than the current date, remove it
+                elif (expDate[0] < date[0]):
+                    self.itemList.remove(oldestItem)
+
+                # If the day of the food's experation date is older than the current date, remove it
+                elif (expDate[1] < date[1]):
+                    self.itemList.remove(oldestItem)
+
+                # If the food's experation date is todays date, say that the food expires today
+                elif (expDate[0] == date[0] and expDate[1] == date[1]):
+                    print("Your {} expires today!".format(oldestItem))
+
+                # Otherwise, just say nothing has expired
+                else:
+                    print("Nothing has expired!")
+                    
+            savedata(alist, SAVEFILE)
         
         cancel = tk.Button(self, text="Back",
                             command= cancel)
         cancel.pack()
 
-        removeExpired = tk.Button(self, text="Remove All",
-                            command= removeAll)
+        removeExpired = tk.Button(self, text="Yes, I'm sure",
+                            command= removeExpired)
         removeExpired.pack()
-
-        removeAll = tk.Button(self, text="Remove All",
-                            command= removeAll)
-        removeAll.pack()
-
-# Confirmation for Removing items
-class Confirm(tk.Frame):
-    
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        global remove
-        label = tk.Label(self, text="Are you sure you want to remove" + remove + "items", font=LARGE_FONT)
-        label.pack(pady=10,padx=10)
-        global alist
-
-        def cancel():
-            frame = MainGui(parent,controller)
-            controller.frames[Remove] = frame
-            frame.grid(row=0, column=0, sticky="nsew")
-            controller.frames.update
-
-        def remove(expired):
-            if (remove == "all"):
-                alist = []
-
-            elif (remove == "the expired"):
-                pass
-
-        remove = tk.Button(self, text="Yes, I'm sure",
-                                command= remove)
-        remove.pack()
-
-        cancel = tk.Button(self, text="Wait, nevermind",
-                                command= cancel)
-        cancel.pack()
         
         
 ###################### other def #########################
